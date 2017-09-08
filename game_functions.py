@@ -6,7 +6,7 @@ from bullet import Bullet
 from alien import Alien
 from time import sleep
 
-def check_events(ai_settings, screen, ship, bullets):
+def check_events(ai_settings, screen, stats, play_button, ship, bullets):
     """response key and mouse event"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -15,8 +15,9 @@ def check_events(ai_settings, screen, ship, bullets):
             check_keydown_events(event, ai_settings, screen, ship, bullets)
         elif event.type == pygame.KEYUP:
             check_keyup_events(event, ship)
-        return True
-    return False
+        elif event.type == pygame.MOUSEBUTTONUP:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            check_play_button(stats, play_button, mouse_x, mouse_y)
 
 def check_keyup_events(event, ship):
     """response key up event"""
@@ -40,7 +41,7 @@ def check_keydown_events(event, ai_settings, screen, ship, bullets):
     elif event.key == pygame.K_q:
         sys.exit()
 
-def update_screen(ai_settings, screen, ship, aliens, bullets):
+def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button):
     """update screen image"""
     # repaint screen for each time
     screen.fill(ai_settings.bg_color)
@@ -51,6 +52,9 @@ def update_screen(ai_settings, screen, ship, aliens, bullets):
     ship.blitme()
     
     aliens.draw(screen)
+    
+    if not stats.game_active:
+        play_button.draw_button()
     
     # 绘制屏幕
     pygame.display.flip()
@@ -145,3 +149,6 @@ def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
             ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
             break
             
+def check_play_button(stats, play_button, mouse_x, mouse_y):
+    if play_button.rect.collidepoint(mouse_x, mouse_y):
+        stats.game_active = True
